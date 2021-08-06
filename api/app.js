@@ -4,26 +4,19 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const mongoose = require('mongoose');
+require('dotenv').config()
 
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 
 var app = express();
-const dbUrl = 'mongodb+srv://chai:chai@chaidbcluster.ohmfe.mongodb.net/myFirstDatabase?retryWrites=true&w=majority/meetingScheduler/appointments'
+const dbUrl = 'mongodb+srv://chai:chai@chaidbcluster.ohmfe.mongodb.net/meetingScheduler?retryWrites=true&w=majority'
 
 mongoose.Promise = global.Promise;
-//Adds connection to database using mongoose
-//for <dbuser>:replace with your username, <dbpassword>: replace with your password.
-//<DATABASE_URL>: replace with database url, example:ds234562.mlab.com:17283
-
-
-mongoose.connect(dbUrl, {useNewUrlParser: true, useUnifiedTopology: true }, (err) => {
-  if (err)
-      console.error(err);
-  else
-      console.log("Connected to the mongodb"); 
-});
+mongoose.connect( dbUrl, { useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true })
+.then(() => console.log( 'Database Connected' ))
+.catch(err => console.log( err ));
 
 
 //This enabled CORS, Cross-origin resource sharing (CORS) is a mechanism that allows restricted resources (e.g. fonts) 

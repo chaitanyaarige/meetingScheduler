@@ -1,12 +1,17 @@
-const { Appointment, Slot } = require('../models/index.js');
 
-const Nexmo = require("nexmo");
+let Appointment = require('../models/appointment.js');
+let Slot = require('../models/slot.js');
+require('dotenv').config()
+
+
+const Vonage = require('@vonage/server-sdk')
+const { request } = require('../../app.js');
 const appointmentController = {
+
   all(req, res) {
-    console.log('te1sr', Appointment)
-    // Returns all appointments
     Appointment.find({}).exec((err, appointments) => res.json(appointments));
   },
+
   create(req, res) {
     var requestBody = req.body;
     var newslot = new Slot({
@@ -14,7 +19,10 @@ const appointmentController = {
       slot_date: requestBody.slot_date,
       created_at: Date.now()
     });
-    newslot.save();
+    newslot.save()
+      .then(() => console.log('User saved properly'))
+      .catch(err => console.log(err, "There was an error creating the user"));
+
     // Creates a new record from a submitted form
     var newappointment = new Appointment({
       name: requestBody.name,
@@ -22,34 +30,42 @@ const appointmentController = {
       phone: requestBody.phone,
       slots: newslot._id
     });
-    const nexmo = new Nexmo({
-      apiKey: process.env.apikey,
-      apiSecret: process.env.apiSecret
-    });
-    let msg =
-      requestBody.name +
-      " " +
-      "this message is to confirm your appointment at" +
-      " " +
-      requestBody.appointment;
-    // and saves the record to
-    // the data base
+
+    const vonage = new Vonage({
+      apiKey: process.env.apiKey.toString(),
+      apiSecret: process.env.apiSecret.toString()
+    })
+
+    let msg = requestBody.name + " " + "this message is to confirm your appointment";
+
+
     newappointment.save((err, saved) => {
-      // Returns the saved appointment
-      // after a successful save
-      Appointment.find({ _id: saved._id })
-        .populate("slots")
-        .exec((err, appointment) => res.json(appointment));
-      const from = VIRTUAL_NUMBER;
-      const to = 8886142522;
-      // nexmo.message.sendSms(from, to, msg, (err, responseData) => {
-      //   if (err) {
-      //     console.log(err);
-      //   } else {
-      //     console.log(responseData);
-      //   }
-      // });
-    });
+      console.log(saved, "saved")
+
+      // Appointment.find({ _id: saved._id })
+      // .populate("slots")
+      // .exec((err, appointment) => res.json(appointment));
+
+      const from = "Vonage APIs"
+      // const from = "918886142522"
+      const to = "918008568626";
+      const text = msg;
+
+      vonage.message.sendSms(from, to, text, (err, responseData) => {
+        if (err) {
+          console.log(err);
+        } else {
+          if (responseData.messages[0]['status'] === "0") {
+            console.log("Message sent successfully.");
+          } else {
+            console.log(`Message failed with error: ${responseData.messages[0]['error-text']}`);
+          }
+        }
+      })
+
+
+    }).then(() => console.log('User saved and sent SMS properly'))
+      .catch(err => console.log(err, "There was an error sending SMS to user"))
   }
 };
 module.exports = appointmentController;
