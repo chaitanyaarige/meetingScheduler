@@ -1,1 +1,6 @@
 replace ejs with Mustache
+in Find All, populate slots
+
+Find appointment on a selected day 
+
+Delete a selected ID appointment

@@ -10,7 +10,8 @@ router.get('/', function(req, res, next) {
 
 router.get('/appointments', appointmentController.all);
 router.get('/retrieveSlots', slotController.all);
-router.post('/appointmentcreate', appointmentController.create);
+router.post('/appointment/create', appointmentController.create);
+router.delete('/appointment/delete/:id', appointmentController.delete);
 
 
 
