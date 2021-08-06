@@ -1,8 +1,9 @@
-const { Appointment, Slot } = require('./../models/index.js');
+const { Appointment, Slot } = require('../models/index.js');
 
 const Nexmo = require("nexmo");
 const appointmentController = {
   all(req, res) {
+    console.log('te1sr', Appointment)
     // Returns all appointments
     Appointment.find({}).exec((err, appointments) => res.json(appointments));
   },
@@ -22,8 +23,8 @@ const appointmentController = {
       slots: newslot._id
     });
     const nexmo = new Nexmo({
-      apiKey: "YOUR_API_KEY",
-      apiSecret: "YOUR_API_SECRET"
+      apiKey: process.env.apikey,
+      apiSecret: process.env.apiSecret
     });
     let msg =
       requestBody.name +
@@ -40,14 +41,14 @@ const appointmentController = {
         .populate("slots")
         .exec((err, appointment) => res.json(appointment));
       const from = VIRTUAL_NUMBER;
-      const to = RECIPIENT_NUMBER;
-      nexmo.message.sendSms(from, to, msg, (err, responseData) => {
-        if (err) {
-          console.log(err);
-        } else {
-          console.dir(responseData);
-        }
-      });
+      const to = 8886142522;
+      // nexmo.message.sendSms(from, to, msg, (err, responseData) => {
+      //   if (err) {
+      //     console.log(err);
+      //   } else {
+      //     console.log(responseData);
+      //   }
+      // });
     });
   }
 };
