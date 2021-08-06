@@ -26,8 +26,8 @@ const appointmentController = {
   create(req, res) {
     var requestBody = req.body;
     var newslot = new Slot({
-      slot_time: requestBody.slot_time,
-      slot_date: requestBody.slot_date,
+      slot_time: requestBody.slots.slot_time,
+      slot_date: requestBody.slots.slot_date,
       created_at: Date.now()
     });
     newslot.save()
